@@ -1,0 +1,161 @@
+#/bin/zsh
+
+help=false
+env_file=""
+ls=false
+stdout=false
+dry_run=false
+question=""
+dir=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --help|-h)
+      help=true
+      ;;
+    --env|-e)
+      shift
+      env_file="$1"
+      ;;
+    --ls)
+      ls=true
+      ;;
+    --stdout)
+      stdout=true
+      ;;
+    --dry-run)
+      dry_run=true
+      ;;
+    *)
+      if [ -z "$question" ]; then
+        question="$1"
+      else
+        dir="$(realpath "$1")"
+      fi
+      ;;
+  esac
+  shift
+done
+
+if [ -n "$env_file" ]; then
+  if [ -f "$env_file" ]; then
+    source "$env_file"
+  else
+    echo "Error: .env file '$env_file' not found."
+    exit 1
+  fi
+fi
+
+if [ -z "$dir" ]; then
+  dir="$(pwd)"
+fi
+
+help() {
+  echo "Usage: chatdir [question] [directory]"
+  echo "   -e, --env <file>   Load GEMINI_API_KEY from a .env file"
+  echo "       --ls           List all targeted files"
+  echo "       --stdout       Print the generated prompt to stdout"
+  echo "       --dry-run      Print the curl command without executing it"
+  echo "   -h, --help         Show this help message"
+}
+
+list_files() {
+  local dir="$1"
+  git_root=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null)
+  if [ $? -eq 0 ]; then
+    git -C "$git_root" ls-files --exclude-standard | while read -r file; do
+      echo "$git_root/$file"
+    done | grep "^$dir/"
+  else
+    find "$dir" -type f
+  fi
+}
+
+ext() {
+  local file="$1"
+  local filename=$(basename -- "$file")
+  local extension="${filename##*.}"
+  if [ "$filename" = "$extension" ]; then
+    echo "$filename"
+  else
+    echo "$extension"
+  fi
+}
+
+format() {
+  local file="$1"
+  local extension=$(ext "$file")
+  echo "\`$file\`:"
+  echo ""
+  echo '```````'"$extension"
+  cat "$file"
+  echo '```````'
+}
+
+context() {
+  local dir="$1"
+  local files=$(list_files "$dir")
+  echo "Project Directory: $dir"
+  echo "\nIncluded Files:\n\n\`\`\`"
+  echo "$files"
+  echo "\`\`\`\n"
+  for file in $files; do
+    format "$file"
+    echo ""
+  done
+}
+
+prompt() {
+  local dir="$1"
+  local question="$2"
+  context "$dir"
+  echo -n "---\n\n$question"
+}
+
+json_body() {
+  local dir="$1"
+  local questions="$2"
+  prompt "$dir" "$questions" \
+    | jq --raw-input --slurp --compact-output --monochrome-output -j '{"contents": [{"parts": [{"text": .}] } ] }'
+}
+
+if $help; then
+  help
+  exit 0
+fi
+
+if $ls; then
+  list_files "$dir"
+  exit 0
+fi
+
+if [ -z "$question" ]; then
+  echo "Error: No question provided."
+  help
+  exit 1
+fi
+
+if [ -z "$GEMINI_API_KEY" ]; then
+  echo "Error: GEMINI_API_KEY environment variable is not set."
+  exit 1
+fi
+
+if $stdout; then
+  json_body "$dir" "$question"
+else
+  API_ENDPOINT="https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=$GEMINI_API_KEY"
+  if $dry_run; then
+    echo "curl \\"
+    echo "  --silent \\"
+    echo "  -H "Content-Type: application/json" \\"
+    echo "  -X POST \"$API_ENDPOINT\" \\"
+    printf "  -d '"
+    json_body "$dir" "$question"
+    echo "'"
+  else
+    json_body "$dir" "$question" \
+      | curl --silent -H "Content-Type: application/json" -X POST "$API_ENDPOINT" -d @- \
+      | jq -r '.candidates[0].content.parts[0].text'
+  fi
+fi
+
