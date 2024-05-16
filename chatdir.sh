@@ -2,9 +2,11 @@
 
 help=false
 env_file=""
+model="gemini-1.5-pro-latest"
 ls=false
 stdout=false
 dry_run=false
+tokens=false
 question=""
 dir=""
 
@@ -17,6 +19,13 @@ while [[ $# -gt 0 ]]; do
       shift
       env_file="$1"
       ;;
+    --flash)
+      model="gemini-1.5-flash-latest"
+      ;;
+    --model|-m)
+      shift
+      model="$1"
+      ;;
     --ls)
       ls=true
       ;;
@@ -25,6 +34,9 @@ while [[ $# -gt 0 ]]; do
       ;;
     --dry-run)
       dry_run=true
+      ;;
+    --tokens)
+      tokens=true
       ;;
     *)
       if [ -z "$question" ]; then
@@ -53,9 +65,12 @@ fi
 help() {
   echo "Usage: chatdir [question] [directory]"
   echo "   -e, --env <file>   Load GEMINI_API_KEY from a .env file"
+  echo "   -m, --model <name> Use the specified model (default: gemini-1.5-pro-latest)"
+  echo "       --flash        Use the gemini-1.5-flash-latest model"
   echo "       --ls           List all targeted files"
   echo "       --stdout       Print the generated prompt to stdout"
-  echo "       --dry-run      Print the curl command without executing it"
+  echo "       --tokens       Count the tokens in the generated prompt without prompting the model"
+  echo "       --dry-run      Print the resulting curl command without executing it"
   echo "   -h, --help         Show this help message"
 }
 
@@ -142,8 +157,23 @@ fi
 
 if $stdout; then
   json_body "$dir" "$question"
+elif $tokens; then
+  API_ENDPOINT="https://generativelanguage.googleapis.com/v1beta/models/$model:countTokens?key=$GEMINI_API_KEY"
+  if $dry_run; then
+    echo "curl \\"
+    echo "  --silent \\"
+    echo "  -H "Content-Type: application/json" \\"
+    echo "  -X POST \"$API_ENDPOINT\" \\"
+    printf "  -d '"
+    json_body "$dir" "$question"
+    echo "'"
+  else
+    json_body "$dir" "$question" \
+      | curl --silent -H "Content-Type: application/json" -X POST "$API_ENDPOINT" -d @- \
+      | jq -r '.totalTokens'
+  fi
 else
-  API_ENDPOINT="https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=$GEMINI_API_KEY"
+  API_ENDPOINT="https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$GEMINI_API_KEY"
   if $dry_run; then
     echo "curl \\"
     echo "  --silent \\"
@@ -158,4 +188,3 @@ else
       | jq -r '.candidates[0].content.parts[0].text'
   fi
 fi
-
