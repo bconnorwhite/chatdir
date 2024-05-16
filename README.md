@@ -1,6 +1,10 @@
 # chatdir
 
-A CLI tool to prompt [Google Gemini](https://ai.google.dev/gemini-api) with the contents of a directory.
+> A CLI tool to prompt [Google Gemini](https://ai.google.dev/gemini-api) with the contents of a directory.
+
+Gemini 1.5 Pro has a 2 million token context window, while Gemini 1.5 Flash has a 1 million token context window. Additionally, both models have a [free tier](https://ai.google.dev/pricing). This makes Gemini 1.5 great for high-level prompts over entire directories of your codebase.
+
+Chatdir lets you easily prompt Gemini with an entire directory.
 
 ## Setup
 
