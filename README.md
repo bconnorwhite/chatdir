@@ -69,7 +69,7 @@ Usage: chatdir [question] [directory]
 
 ## Prompt Format
 
-Each prompt uses the following format:
+Prompts use the following format:
 ````````
 Project Directory: /path/to/dir
 

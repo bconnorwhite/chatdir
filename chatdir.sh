@@ -144,14 +144,14 @@ if $ls; then
   exit 0
 fi
 
-if [ -z "$question" ]; then
-  echo "Error: No question provided."
-  help
+if [ -z "$GEMINI_API_KEY" ]; then
+  echo "Error: GEMINI_API_KEY environment variable is not set."
   exit 1
 fi
 
-if [ -z "$GEMINI_API_KEY" ]; then
-  echo "Error: GEMINI_API_KEY environment variable is not set."
+if [ -z "$question" ]; then
+  echo "Error: No question provided."
+  help
   exit 1
 fi
 
