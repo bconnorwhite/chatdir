@@ -7,8 +7,8 @@ ls=false
 stdout=false
 dry_run=false
 tokens=false
-question=""
 dir=""
+question=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -41,8 +41,14 @@ while [[ $# -gt 0 ]]; do
     *)
       if [ -z "$question" ]; then
         question="$1"
+      elif [ -z "$dir" ]; then
+        # If we already have a question, shift the question to the directory and take the second argument as the question
+        dir="$(realpath "$question")"
+        question="$1"
       else
-        dir="$(realpath "$1")"
+        echo "Error: Too many arguments."
+        help
+        exit 1
       fi
       ;;
   esac
@@ -63,7 +69,7 @@ if [ -z "$dir" ]; then
 fi
 
 help() {
-  echo "Usage: chatdir [question] [directory]"
+  echo "Usage: chatdir [directory] <question>"
   echo "   -e, --env <file>   Load GEMINI_API_KEY from a .env file"
   echo "   -m, --model <name> Use the specified model (default: gemini-2.0-flash)"
   echo "       --pro          Use the gemini-1.5-pro model"

@@ -56,7 +56,7 @@ By default, gitignored files are excluded from the prompt.
 You can preview the files that will be included by using the `--ls` flag. Additionally, you can preview the full prompt by using the `--stdout` flag, or the curl command that will be sent to Google with the `--dry-run` flag.
 
 ```
-Usage: chatdir [question] [directory]
+Usage: chatdir [directory] <question>
    -e, --env <file>   Load GEMINI_API_KEY from a .env file
    -m, --model <name> Use the specified model (default: gemini-2.0-flash)
        --pro          Use the gemini-1.5-pro model
