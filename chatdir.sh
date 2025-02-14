@@ -155,7 +155,7 @@ if [ -z "$GEMINI_API_KEY" ]; then
   exit 1
 fi
 
-if [ -z "$question" ]; then
+if [ -z "$question" ] && ! $tokens; then
   echo "Error: No question provided."
   help
   exit 1
