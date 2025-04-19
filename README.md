@@ -64,6 +64,7 @@ Usage: chatdir [directory] <question>
        --stdout       Print the generated prompt to stdout
        --tokens       Count the tokens in the generated prompt without prompting the model
        --dry-run      Print the resulting curl command without executing it
+       --json         Output the raw JSON response from the API
    -h, --help         Show this help message
 ```
 

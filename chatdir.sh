@@ -12,6 +12,7 @@ dry_run=false
 tokens=false
 dir=""
 question=""
+json_output=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -40,6 +41,9 @@ while [[ $# -gt 0 ]]; do
       ;;
     --tokens)
       tokens=true
+      ;;
+    --json)
+      json_output=true
       ;;
     *)
       if [ -z "$question" ]; then
@@ -80,6 +84,7 @@ help() {
   echo "       --stdout       Print the generated prompt to stdout"
   echo "       --tokens       Count the tokens in the generated prompt without prompting the model"
   echo "       --dry-run      Print the resulting curl command without executing it"
+  echo "       --json         Output the raw JSON response from the API"
   echo "   -h, --help         Show this help message"
 }
 
@@ -177,9 +182,14 @@ elif $tokens; then
     json_body "$dir" "$question"
     echo "'"
   else
-    json_body "$dir" "$question" \
-      | curl --silent -H "Content-Type: application/json" -X POST "$API_ENDPOINT" -d @- \
-      | jq -r '.totalTokens'
+    if $json_output; then
+      json_body "$dir" "$question" \
+        | curl --silent -H "Content-Type: application/json" -X POST "$API_ENDPOINT" -d @-
+    else
+      json_body "$dir" "$question" \
+        | curl --silent -H "Content-Type: application/json" -X POST "$API_ENDPOINT" -d @- \
+        | jq -r '.totalTokens'
+    fi
   fi
 else
   API_ENDPOINT="https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$GEMINI_API_KEY"
@@ -192,8 +202,13 @@ else
     json_body "$dir" "$question"
     echo "'"
   else
-    json_body "$dir" "$question" \
-      | curl --silent -H "Content-Type: application/json" -X POST "$API_ENDPOINT" -d @- \
-      | jq -r '.candidates[0].content.parts[0].text'
+    if $json_output; then
+      json_body "$dir" "$question" \
+        | curl --silent -H "Content-Type: application/json" -X POST "$API_ENDPOINT" -d @-
+    else
+      json_body "$dir" "$question" \
+        | curl --silent -H "Content-Type: application/json" -X POST "$API_ENDPOINT" -d @- \
+        | jq -r '.candidates[0].content.parts[0].text'
+    fi
   fi
 fi
