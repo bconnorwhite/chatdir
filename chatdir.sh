@@ -2,7 +2,7 @@
 
 help=false
 env_file=""
-model="gemini-2.0-flash"
+model="gemini-2.5-flash-preview-04-17"
 ls=false
 stdout=false
 dry_run=false
@@ -20,7 +20,7 @@ while [[ $# -gt 0 ]]; do
       env_file="$1"
       ;;
     --pro)
-      model="gemini-1.5-pro"
+      model="gemini-2.5-pro-exp-03-25"
       ;;
     --model|-m)
       shift
@@ -71,8 +71,8 @@ fi
 help() {
   echo "Usage: chatdir [directory] <question>"
   echo "   -e, --env <file>   Load GEMINI_API_KEY from a .env file"
-  echo "   -m, --model <name> Use the specified model (default: gemini-2.0-flash)"
-  echo "       --pro          Use the gemini-1.5-pro model"
+  echo "   -m, --model <name> Use the specified model (default: gemini-2.5-flash-preview-04-17)"
+  echo "       --pro          Use the gemini-2.5-pro-exp-03-25 model"
   echo "       --ls           List all targeted files"
   echo "       --stdout       Print the generated prompt to stdout"
   echo "       --tokens       Count the tokens in the generated prompt without prompting the model"

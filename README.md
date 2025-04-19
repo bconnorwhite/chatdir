@@ -2,7 +2,7 @@
 
 > A CLI tool to prompt [Google Gemini](https://ai.google.dev/gemini-api) with the contents of a directory.
 
-Gemini 2.0 Flash has a 1 million token context window, while Gemini 1.5 Flash has a 2 million token context window. Additionally, both models have a [free tier](https://ai.google.dev/pricing). This makes Gemini great for high-level questions over large directories.
+Gemini 2.5 has a 1 million token context window and a [free tier](https://ai.google.dev/pricing). This makes Gemini great for high-level questions over large directories.
 
 Chatdir lets you easily prompt Gemini with the contents of a diretory.
 
@@ -58,8 +58,8 @@ You can preview the files that will be included by using the `--ls` flag. Additi
 ```
 Usage: chatdir [directory] <question>
    -e, --env <file>   Load GEMINI_API_KEY from a .env file
-   -m, --model <name> Use the specified model (default: gemini-2.0-flash)
-       --pro          Use the gemini-1.5-pro model
+   -m, --model <name> Use the specified model (default: gemini-2.5-flash-preview-04-17)
+       --pro          Use the gemini-2.5-pro-exp-03-25 model
        --ls           List all targeted files
        --stdout       Print the generated prompt to stdout
        --tokens       Count the tokens in the generated prompt without prompting the model
