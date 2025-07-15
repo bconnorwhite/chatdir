@@ -88,15 +88,31 @@ help() {
   echo "   -h, --help         Show this help message"
 }
 
+is_binary() {
+  local file="$1"
+  local encoding=$(file --mime-encoding -bL "$file" 2>/dev/null)
+  [ "$encoding" = "binary" ]
+}
+
 list_files() {
   local dir="$1"
   git_root=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null)
   if [ $? -eq 0 ]; then
     git -C "$git_root" ls-files --exclude-standard | while read -r file; do
-      echo "$git_root/$file"
-    done | grep "^$dir/"
+      local full_path="$git_root/$file"
+      # Only include if it's under the target directory and not binary
+      if [[ "$full_path" == "$dir"/* ]] && ! is_binary "$full_path"; then
+        echo "$full_path"
+      fi
+    done
   else
-    find "$dir" -type f
+    find "$dir" -type f -exec sh -c '
+      for file do
+        if ! is_binary "$file"; then
+          echo "$file"
+        fi
+      done
+    ' sh {} +
   fi
 }
 
