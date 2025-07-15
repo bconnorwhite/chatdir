@@ -1,7 +1,7 @@
 #/bin/zsh
 
-FLASH_MODEL="gemini-2.5-flash-preview-04-17"
-PRO_MODEL="gemini-2.5-pro-exp-03-25"
+FLASH_MODEL="gemini-2.5-flash"
+PRO_MODEL="gemini-2.5-pro"
 
 help=false
 env_file=""

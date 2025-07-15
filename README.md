@@ -58,8 +58,8 @@ You can preview the files that will be included by using the `--ls` flag. Additi
 ```
 Usage: chatdir [directory] <question>
    -e, --env <file>   Load GEMINI_API_KEY from a .env file
-   -m, --model <name> Use the specified model (default: gemini-2.5-flash-preview-04-17)
-       --pro          Use the gemini-2.5-pro-exp-03-25 model
+   -m, --model <name> Use the specified model (default: gemini-2.5-flash)
+       --pro          Use the gemini-2.5-pro model
        --ls           List all targeted files
        --stdout       Print the generated prompt to stdout
        --tokens       Count the tokens in the generated prompt without prompting the model
