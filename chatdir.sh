@@ -128,10 +128,10 @@ context() {
   echo "\nIncluded Files:\n\n\`\`\`"
   echo "$files"
   echo "\`\`\`\n"
-  for file in $files; do
-    format "$file"
+  while IFS= read -r file; do
+    [ -n "$file" ] && format "$file"
     echo ""
-  done
+  done <<< "$files"
 }
 
 prompt() {
