@@ -2,9 +2,9 @@
 
 > A CLI tool to prompt [Google Gemini](https://ai.google.dev/gemini-api) with the contents of a directory.
 
-Gemini 2.5 has a 1 million token context window and a [free tier](https://ai.google.dev/pricing). This makes Gemini great for high-level questions over large directories.
+Gemini has a large context window and a [free tier](https://ai.google.dev/pricing). This makes Gemini great for ad-hoc, high-level questions over large directories.
 
-Chatdir lets you easily prompt Gemini with the contents of a diretory.
+Chatdir lets you easily prompt Gemini with the contents of a directory.
 
 ## Setup
 
@@ -58,7 +58,7 @@ You can preview the files that will be included by using the `--ls` flag. Additi
 ```
 Usage: chatdir [directory] <question>
    -e, --env <file>   Load GEMINI_API_KEY from a .env file
-   -m, --model <name> Use the specified model (default: gemini-2.5-flash)
+   -m, --model <name> Use the specified model (default: gemini-3-flash-preview)
        --pro          Use the gemini-2.5-pro model
        --ls           List all targeted files
        --stdout       Print the generated prompt to stdout
@@ -66,6 +66,23 @@ Usage: chatdir [directory] <question>
        --dry-run      Print the resulting curl command without executing it
        --json         Output the raw JSON response from the API
    -h, --help         Show this help message
+```
+
+### Model selection
+
+By default, `chatdir` uses `gemini-3-flash-preview`, which currently has a published Gemini API free tier. The `--pro` flag uses `gemini-2.5-pro`, which has a free tier unlike more recent pro models.
+
+Use `--model` for one-off model changes:
+
+```sh
+../path/to/chatdir.sh --model gemini-3.1-pro-preview "Review this repo"
+```
+
+Or set persistent defaults with environment variables:
+
+```sh
+export CHATDIR_FLASH_MODEL="gemini-3-flash-preview"
+export CHATDIR_PRO_MODEL="gemini-2.5-pro"
 ```
 
 ## Prompt Format

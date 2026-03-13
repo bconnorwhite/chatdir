@@ -1,7 +1,9 @@
 #/bin/zsh
 
-FLASH_MODEL="gemini-2.5-flash"
-PRO_MODEL="gemini-2.5-pro"
+# Keep the default model on the current free-tier Flash release, while leaving
+# --pro on a stable API model that still has a published free tier.
+FLASH_MODEL="${CHATDIR_FLASH_MODEL:-gemini-3-flash-preview}"
+PRO_MODEL="${CHATDIR_PRO_MODEL:-gemini-2.5-pro}"
 
 help=false
 env_file=""
